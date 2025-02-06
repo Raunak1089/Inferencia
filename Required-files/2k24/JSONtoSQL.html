@@ -112,20 +112,20 @@
     </script>
 </head>
 <body>
-<div>
-Once you have downloaded the JSON file from the Flask webapge, you can drop it here.
-<br>
-The corresponding SQL Queries will get copied to clipboard which you can paste in any MySQL server, 
-<br>
-which will create a database named "inferencia2k25_db" and the table of data named "students" with any column name containing "id" as primary key.
+<div style="margin: 20px;">
+	Once you have downloaded the JSON file from the Flask webapge, you can drop it here.
+	<br>
+	The corresponding SQL Queries will get copied to clipboard which you can paste in any MySQL server, 
+	<br>
+	which will create a database named "inferencia2k25_db" and the table of data named "students" with any column name containing "id" as primary key.
 </div>
     <div class="container">
         <h1>JSON to SQL Converter</h1>
 	<div style="margin: 20px;">
-	<label for="dbName"><span>Database Name</span></label>
-	<input id="dbName" placeholder="Database Name" value="inferencia2k25_db">
-	<label for="tableName"><span>Table Name</span></label>
-	<input id="tableName" placeholder="Table Name" value="students">
+		<label for="dbName"><span>Database Name</span></label>
+		<input id="dbName" placeholder="Database Name" value="inferencia2k25_db">
+		<label for="tableName"><span>Table Name</span></label>
+		<input id="tableName" placeholder="Table Name" value="students">
 	</div>
         <label for="fileInput" id="fileLabel"><span>Choose JSON file</span></label>
         <input type="file" id="fileInput" accept=".json" onchange="handleFileSelect(event)">
