@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Create Table</title>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="" type="text/css" />
+  </head>
+  <style>
+    table {
+      border-collapse: collapse;
+    }
+
+    table,
+    tr,
+    td {
+      border: 1px solid black;
+    }
+    tr:first-child {
+      font-weight: bold;
+    }
+  </style>
+  <body>
+    <textarea id="tab" placeholder="Paste your Excel table here"></textarea>
+    <button onClick="create()">OK</button>
+
+	<div id="getQueries" style="display: none">
+	<input type="text" id="table_name" placeholder="Table name">
+
+    <button onclick="getQueries()">GET QUERIES</button>
+	</div>
+
+    <script>
+	function create() {
+		let text = document.querySelector("#tab").value;
+
+		// Assuming the text to be parsed is stored in a variable called "text"
+		const rows = text.split("\n").filter((row) => row.trim() !== "");
+		const table = document.createElement("table");
+
+		rows.forEach((rowText) => {
+			const cellsText = rowText.split("\t");
+			const row = document.createElement("tr");
+
+			cellsText.forEach((cellText) => {
+			const cell = document.createElement("td");
+			cell.textContent = cellText;
+			row.appendChild(cell);
+			});
+
+			table.appendChild(row);
+		});
+
+		document.body.appendChild(table);
+
+		document.querySelector("div#getQueries").style.display = "inline";
+	}
+
+	function getQueries() {
+		let queries = '';
+
+		const table = document.querySelector('table');
+		const tableRows = table.querySelectorAll('tr');
+
+		// Get the headers
+		const headers = Array.from(tableRows[0].querySelectorAll('td')).map(td => '`'+td.textContent+'`');
+
+		// Iterate through <tr> elements (excluding the first one with headers)
+		for (let i = 1; i < tableRows.length; i++) {
+			const currentRowTds = tableRows[i].querySelectorAll('td');
+			const values = Array.from(currentRowTds).map(td => '`'+td.textContent+'`');
+
+			const insertStatement = `INSERT INTO ${table_name.value} (${headers.join(', ')}) VALUES (${values.join(', ')});\n`;
+
+			// Log the INSERT INTO statement to the console
+			queries+=insertStatement;
+		}
+
+		navigator.clipboard.writeText(queries).then(function() {
+            alert("SQL Quries copied to clipboard");
+        }).catch(function(err) {
+            console.error("Unable to copy text to clipboard: ", err);
+        });
+	}
+
+
+
+    </script>
+  </body>
+</html>
