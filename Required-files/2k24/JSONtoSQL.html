@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON to SQL Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        label {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        label:hover {
+            background-color: #0056b3;
+        }
+
+        #fileLabel {
+            margin-bottom: 20px;
+            display: block;
+            text-align: center;
+        }
+
+        #fileLabel span {
+            font-weight: bold;
+        }
+
+    </style>
+    <script>
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                const json = JSON.parse(e.target.result);
+                const sqlQueries = generateSQLQueries(json);
+                console.log(sqlQueries);
+                // You can execute these queries in your database
+                navigator.clipboard.writeText(sqlQueries).then(function() {
+                    alert("SQL Queries copied to clipboard");
+                }).catch(function(err) {
+                    console.error("Unable to copy text to clipboard: ", err);
+                });
+
+            };
+
+            reader.readAsText(file);
+        }
+
+        function generateSQLQueries(data) {
+            if (!Array.isArray(data) || data.length === 0) {
+                return '';
+            }
+
+            const keys = Object.keys(data[0]);
+            const primaryKey = keys.find(key => key.toLowerCase().includes('id')) || keys[0];
+            const columns = keys.filter(key => key !== primaryKey);
+
+            let queries = [];
+            // Create table query
+            let createTableQuery = `CREATE TABLE \`inferencia2k24_db\`.\`students\` (\`${primaryKey}\` VARCHAR(8) PRIMARY KEY`;
+            columns.forEach(column => {
+                createTableQuery += `, \`${column}\` TEXT NOT NULL`;
+            });
+            createTableQuery += ') ENGINE = InnoDB;';
+            queries.push(createTableQuery);
+
+            // Insert data queries
+            data.forEach(item => {
+                let insertQuery = `INSERT INTO students (${primaryKey}, ${columns.join(', ')}) VALUES (`;
+                insertQuery += `'${item[primaryKey]}'`;
+                columns.forEach(column => {
+                    insertQuery += `, '${item[column]}'`;
+                });
+                insertQuery += ');';
+                queries.push(insertQuery);
+            });
+
+            return queries.join('\n');
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>JSON to SQL Converter</h1>
+        <label for="fileInput" id="fileLabel"><span>Choose JSON file</span></label>
+        <input type="file" id="fileInput" accept=".json" onchange="handleFileSelect(event)">
+    </div>
+</body>
+</html>
